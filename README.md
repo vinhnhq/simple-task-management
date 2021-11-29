@@ -22,3 +22,4 @@ frontend
   - common folder will hold everything which are shared on the whole application
   - modules, in the other hand will hold the code which is belonging to it - including its state. in this application is repo, list, and card
   - for some application state it will be located at highest level to reuse. in this situation, is info and error, which will be notified as well as collected and save back to monitor service.
+  - unit test is just basic and will be updated later
