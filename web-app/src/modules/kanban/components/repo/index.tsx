@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useCallback, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 
+import { useRepoStore } from '../../store';
 import {
-  useRepoStore,
   useFetchRepos,
   setCurrentRepo,
   updateCurrentRepo,
   createNewRepo,
   deleteCurrentRepo,
-} from '../../store';
+} from '../../store/repoActions';
 
 export function Repo() {
   const { items, selectedItem, loading, error, selectedItemId } = useRepoStore();

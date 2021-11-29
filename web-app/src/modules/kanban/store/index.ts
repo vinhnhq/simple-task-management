@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
 import { derive } from 'valtio/utils';
 import { proxy, useSnapshot } from 'valtio';
 
-import { kanban } from 'src/api';
 import { IList, IRepo } from 'src/interfaces';
 
-const store = proxy<{
+export const store = proxy<{
   repo: {
     items: IRepo[];
     selectedItemId?: string;
@@ -18,6 +16,10 @@ const store = proxy<{
     loading: boolean;
     error: string | null;
   };
+  card: {
+    loading: boolean;
+    error: string | null;
+  };
 }>({
   repo: {
     items: [],
@@ -27,7 +29,10 @@ const store = proxy<{
   },
   list: {
     items: [],
-    selectedItemId: undefined,
+    loading: false,
+    error: null,
+  },
+  card: {
     loading: false,
     error: null,
   },
@@ -35,7 +40,13 @@ const store = proxy<{
 
 const derivedRepo = derive(
   {
-    selectedItem: (get) => get(store.repo).items.find((item) => item.id === get(store).repo.selectedItemId),
+    selectedItem: (get) => {
+      if (get(store.repo).items.length === 0) {
+        return null;
+      }
+
+      return get(store.repo).items.find((item) => item.id === get(store).repo.selectedItemId);
+    },
   },
   {
     proxy: store.repo,
@@ -50,119 +61,6 @@ export function useListStore() {
   return useSnapshot(store.list);
 }
 
-export async function fetchRepos() {
-  try {
-    store.repo.loading = true;
-
-    const response = await kanban.getAllRepos();
-    store.repo.items = response.parsedBody?.repos || [];
-
-    if (!store.repo.selectedItemId) {
-      store.repo.selectedItemId = store.repo.items[0].id;
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      store.repo.error = error.message;
-    }
-  } finally {
-    store.repo.loading = false;
-  }
-}
-
-export function setCurrentRepo(id: string) {
-  store.repo.selectedItemId = store.repo.items.find((repo) => repo.id === id)?.id;
-}
-
-export function useFetchRepos() {
-  useEffect(() => {
-    fetchRepos();
-  }, []);
-}
-
-export async function updateCurrentRepo(name: string) {
-  if (!store.repo.selectedItemId) {
-    return;
-  }
-
-  try {
-    store.repo.loading = true;
-
-    const response = await kanban.editRepo({ id: store.repo.selectedItemId, name });
-    if (response) {
-      const repo = store.repo.items.find((repo) => repo.id === store.repo.selectedItemId);
-      if (repo) {
-        repo.name = name;
-        store.repo.selectedItemId = repo.id;
-      }
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      store.repo.error = error.message;
-    }
-  } finally {
-    store.repo.loading = false;
-  }
-}
-
-export async function createNewRepo(name: string) {
-  try {
-    store.repo.loading = true;
-
-    const response = await kanban.createRepo({ name });
-    if (response.parsedBody) {
-      store.repo.items.push(response.parsedBody);
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      store.repo.error = error.message;
-    }
-  } finally {
-    store.repo.loading = false;
-  }
-}
-
-export async function deleteCurrentRepo() {
-  if (!store.repo.selectedItemId) {
-    return;
-  }
-
-  try {
-    store.repo.loading = true;
-
-    const response = await kanban.deleteRepo(store.repo.selectedItemId);
-    if (response.ok) {
-      const newRepos = store.repo.items.filter((repo) => repo.id !== store.repo.selectedItemId);
-      store.repo.items = newRepos;
-      store.repo.selectedItemId = newRepos[0].id;
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      store.repo.error = error.message;
-    }
-  } finally {
-    store.repo.loading = false;
-  }
-}
-
-export async function fetchLists() {
-  if (!store.repo.selectedItemId) {
-    return;
-  }
-
-  try {
-    store.list.loading = true;
-
-    const response = await kanban.getAllLists(store.repo.selectedItemId);
-    store.list.items = response.parsedBody?.lists || [];
-
-    if (!store.list.selectedItemId) {
-      store.list.selectedItemId = store.list.items[0].id;
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      store.list.error = error.message;
-    }
-  } finally {
-    store.list.loading = false;
-  }
+export function useCardStore() {
+  return useSnapshot(store.card);
 }

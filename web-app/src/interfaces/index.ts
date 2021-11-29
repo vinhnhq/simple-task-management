@@ -1,11 +1,16 @@
+export type IStage = 'Open' | 'Confirmed' | 'False Positive' | 'Fixed';
+
 export interface ICard {
   id: string;
   text: string;
+  note?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IList {
   id: string;
-  title: 'Open' | 'Confirmed' | 'False Positive' | 'Fixed';
+  title: IStage;
   cards: ICard[];
 }
 

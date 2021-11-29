@@ -22,9 +22,13 @@
 }
 
 .itemContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
   margin: 0.5em;
   padding: 0.5em;
-  background: grey;
+  background: tomato;
 
   color: #fff;
   cursor: move;
@@ -34,5 +38,7 @@
 }
 
 .input {
+  width: 15rem;
   margin-top: 1em;
+  margin-right: 0.5em;
 }

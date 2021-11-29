@@ -1,5 +1,5 @@
-import { IList, IRepo } from 'src/interfaces';
 import { API_URL } from 'src/common/constants';
+import { ICard, IList, IRepo, IStage } from 'src/interfaces';
 
 import { get, post, put, del } from './base';
 
@@ -9,7 +9,7 @@ export async function getAllRepos() {
 
 export async function getRepoById(id: string) {
   const path = `${API_URL}/repo/${id}`;
-  return get(path);
+  return get<IRepo>(path);
 }
 
 export async function createRepo(payload: { name: string }) {
@@ -37,13 +37,9 @@ export async function getListById(id: string) {
   return get(path);
 }
 
-export async function createList(payload: { title: string; repoId: string }) {
+export async function createList(payload: { title: IStage; repoId: string }) {
   const path = `${API_URL}/repo/${payload.repoId}/list`;
-  const extendedOptions = {
-    body: JSON.stringify({
-      title: payload.title,
-    }),
-  };
+  const extendedOptions = { title: payload.title };
 
   return post(path, extendedOptions);
 }
@@ -55,9 +51,7 @@ export async function deleteList(id: string) {
 
 export async function editList(payload: { id: string; title: string }) {
   const path = `${API_URL}/list/${payload.id}`;
-  const extendedOptions = { body: JSON.stringify(payload) };
-
-  return put(path, extendedOptions);
+  return put(path, payload);
 }
 
 export async function getAllCards(listId: string) {
@@ -72,23 +66,17 @@ export async function getCardById(id: string) {
 
 export async function createCard(payload: { text: string; listId: string }) {
   const path = `${API_URL}/list/${payload.listId}/card`;
-  const extendedOptions = {
-    body: JSON.stringify({
-      text: payload.text,
-    }),
-  };
+  const extendedOptions = { text: payload.text };
 
-  return post(path, extendedOptions);
+  return post<ICard>(path, extendedOptions);
 }
 
 export async function editCard(payload: { id: string; text: string }) {
   const path = `${API_URL}/card/${payload.id}`;
-  const extendedOptions = { body: JSON.stringify(payload) };
-
-  return put(path, extendedOptions);
+  return put<null>(path, payload);
 }
 
 export async function deleteCard(id: string) {
   const path = `${API_URL}/card/${id}`;
-  return del(path);
+  return del<null>(path);
 }

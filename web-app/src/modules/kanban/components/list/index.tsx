@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 
 import { Board } from './board';
 
-import { useListStore, useRepoStore, fetchLists } from '../../store';
+import { useListStore, useRepoStore } from '../../store';
+import { fetchLists } from '../../store/listActions';
 
 export function List() {
   const repoStore = useRepoStore();
@@ -21,7 +22,7 @@ export function List() {
   }
 
   if (!repoStore.selectedItemId) {
-    return <div>please select a repo to continue</div>;
+    return <div>please create a repo for working on</div>;
   }
 
   return (
