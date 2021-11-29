@@ -56,7 +56,7 @@ export function Repo() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>loading...</div>;
   }
 
   if (error) {
@@ -98,6 +98,7 @@ export function Repo() {
       <style jsx>{`
         .container {
           padding: 1rem;
+          margin-bottom: 1rem;
           border: 2px solid #ccc;
         }
 
@@ -113,14 +114,6 @@ export function Repo() {
 
         button {
           width: 10rem;
-        }
-
-        .mr-1 {
-          margin-right: 0.5em;
-        }
-
-        .mb-1 {
-          margin-bottom: 0.5em;
         }
       `}</style>
     </div>

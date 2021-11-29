@@ -4,7 +4,7 @@ export interface ICard {
 }
 
 export interface IList {
-  id: number;
+  id: string;
   title: 'Open' | 'Confirmed' | 'False Positive' | 'Fixed';
   cards: ICard[];
 }

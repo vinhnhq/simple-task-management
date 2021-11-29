@@ -7,26 +7,26 @@ import { setInfo } from 'src/store';
 import { IList, IRepo } from 'src/interfaces';
 
 const store = proxy<{
-  list: {
-    items: IList[];
-    selectedItemId?: string;
-    loading: boolean;
-    error: string | null;
-  };
   repo: {
     items: IRepo[];
     selectedItemId?: string;
     loading: boolean;
     error: string | null;
   };
-}>({
   list: {
+    items: IList[];
+    selectedItemId?: string;
+    loading: boolean;
+    error: string | null;
+  };
+}>({
+  repo: {
     items: [],
     selectedItemId: undefined,
     loading: false,
     error: null,
   },
-  repo: {
+  list: {
     items: [],
     selectedItemId: undefined,
     loading: false,
@@ -58,11 +58,9 @@ export async function fetchRepos() {
     const response = await kanban.getAllRepos();
     store.repo.items = response.parsedBody?.repos || [];
 
-    if (store.repo.selectedItemId === null) {
+    if (!store.repo.selectedItemId) {
       store.repo.selectedItemId = store.repo.items[0].id;
     }
-
-    setInfo('Repos fetched');
   } catch (error) {
     if (error instanceof Error) {
       store.repo.error = error.message;
@@ -144,5 +142,28 @@ export async function deleteCurrentRepo() {
     }
   } finally {
     store.repo.loading = false;
+  }
+}
+
+export async function fetchLists() {
+  if (!store.repo.selectedItemId) {
+    return;
+  }
+
+  try {
+    store.list.loading = true;
+
+    const response = await kanban.getAllLists(store.repo.selectedItemId);
+    store.list.items = response.parsedBody?.lists || [];
+
+    if (!store.list.selectedItemId) {
+      store.list.selectedItemId = store.list.items[0].id;
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      store.list.error = error.message;
+    }
+  } finally {
+    store.list.loading = false;
   }
 }

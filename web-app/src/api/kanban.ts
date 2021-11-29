@@ -1,4 +1,4 @@
-import { IRepo } from 'src/interfaces';
+import { IList, IRepo } from 'src/interfaces';
 import { API_URL } from 'src/common/constants';
 
 import { get, post, put, del } from './base';
@@ -29,7 +29,7 @@ export async function deleteRepo(id: string) {
 
 export async function getAllLists(repoId: string) {
   const path = `${API_URL}/repo/${repoId}/list`;
-  return get(path);
+  return get<{ lists: IList[] }>(path);
 }
 
 export async function getListById(id: string) {
