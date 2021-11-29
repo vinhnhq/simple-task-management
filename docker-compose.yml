@@ -1,0 +1,23 @@
+version: "3.3"
+
+services:
+  nextjs:
+    ports:
+      - 3000:3000
+    build:
+      context: web-app
+      dockerfile: Dockerfile
+    volumes:
+      - ./web-app:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+
+  nodejs:
+    ports:
+      - 8080:8080
+    build:
+      context: frontend-engineer-challenge/simple-backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend-engineer-challenge/simple-backend:/usr/src/app
+      - /usr/src/app/node_modules
