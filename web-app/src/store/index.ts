@@ -9,7 +9,7 @@ const store = proxy<{
   infos: [],
 });
 
-export function useStore() {
+export function useAppStore() {
   return useSnapshot(store);
 }
 

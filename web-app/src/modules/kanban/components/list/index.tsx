@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, ChangeEvent } from 'react';
+import React, { useEffect } from 'react';
 
 import { Board } from './board';
 
@@ -26,19 +26,7 @@ export function List() {
 
   return (
     <div className="container">
-      {listStore.items.length > 0 && (
-        <div className="wrapper mb-1">
-          <div>
-            <select name="list" value={listStore.selectedItemId} className="mr-1">
-              {listStore.items.map((list) => (
-                <option key={list.id} value={list.id}>
-                  {list.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
+      <p>{`you are working on ${repoStore.selectedItem?.name}`}</p>
 
       <Board />
 

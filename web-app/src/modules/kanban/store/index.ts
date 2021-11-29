@@ -3,7 +3,6 @@ import { derive } from 'valtio/utils';
 import { proxy, useSnapshot } from 'valtio';
 
 import { kanban } from 'src/api';
-import { setInfo } from 'src/store';
 import { IList, IRepo } from 'src/interfaces';
 
 const store = proxy<{
@@ -36,7 +35,7 @@ const store = proxy<{
 
 const derivedRepo = derive(
   {
-    selectedItem: (get) => get(store.repo).items.find((item) => item.id === get(store).list.selectedItemId),
+    selectedItem: (get) => get(store.repo).items.find((item) => item.id === get(store).repo.selectedItemId),
   },
   {
     proxy: store.repo,

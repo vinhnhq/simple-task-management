@@ -1,8 +1,22 @@
 import React, { DragEvent, KeyboardEvent, ReactElement, useState } from 'react';
 
+import { setError } from 'src/store';
+
 import styles from './board.module.css';
 
 type IStage = 'Open' | 'Confirmed' | 'False Positive' | 'Fixed';
+
+export const isValidToTransit = (currStage: IStage, nextState: IStage) => {
+  if (currStage === 'Open') {
+    return true;
+  }
+
+  if (currStage === 'Confirmed' && nextState === 'Fixed') {
+    return true;
+  }
+
+  return false;
+};
 
 export function Board() {
   const [tasks, setTasks] = useState<{ id: string; name: string; category: IStage }[]>([
@@ -17,18 +31,26 @@ export function Board() {
     event.dataTransfer.setData('id', name);
   };
 
-  const onDrop = (event: DragEvent<HTMLDivElement>, category: IStage) => {
+  const onDrop = (event: DragEvent<HTMLDivElement>, nextCategory: IStage) => {
     const id = event.dataTransfer.getData('id');
+    let isTransited = false;
 
     let nextTasks = tasks.filter((task) => {
       if (task.name === id) {
-        task.category = category;
+        if (isValidToTransit(task.category, nextCategory)) {
+          isTransited = true;
+          task.category = nextCategory;
+        } else {
+          setError(`Cannot transit from ${task.category} to ${nextCategory}`);
+        }
       }
 
       return task;
     });
 
-    setTasks(nextTasks);
+    if (isTransited) {
+      setTasks(nextTasks);
+    }
   };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
