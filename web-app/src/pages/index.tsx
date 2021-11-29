@@ -1,9 +1,9 @@
-import type { NextPage } from 'next'
+import type { NextPage } from 'next';
 
-import { Kanban } from 'src/modules/kanban'
+import { Kanban } from 'src/modules/kanban';
 
 const Home: NextPage = () => {
-  return <Kanban/>
-}
+  return <Kanban />;
+};
 
-export default Home
+export default Home;

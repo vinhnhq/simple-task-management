@@ -1,72 +1,75 @@
-import React, { useEffect, useState, useCallback, ChangeEvent } from 'react'
+import React, { useEffect, useState, useCallback, ChangeEvent } from 'react';
 
 import {
-  useStore,
+  useRepoStore,
   useFetchRepos,
   setCurrentRepo,
   updateCurrentRepo,
   createNewRepo,
   deleteCurrentRepo,
-} from '../../store'
+} from '../../store';
 
 export function Repo() {
-  const { repos, currentRepo, reposLoading, reposError } = useStore()
+  const { items, selectedItem, loading, error, selectedItemId } = useRepoStore();
 
-  const [currentName, setCurrentName] = useState<string>('')
-  const [newRepoName, setNewRepoName] = useState<string>('')
+  const [currentName, setCurrentName] = useState<string>('');
+  const [newRepoName, setNewRepoName] = useState<string>('');
 
-  useFetchRepos()
-
-  useEffect(() => {
-    if (currentRepo?.name) {
-      setCurrentName(currentRepo?.name)
-    }
-  }, [currentRepo?.name])
+  useFetchRepos();
 
   useEffect(() => {
-    setNewRepoName('')
-  }, [repos])
-
-  const handleEditChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setCurrentName(event.target.value)
-  }, [])
-
-  const handleNewChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setNewRepoName(event.target.value)
-  }, [])
-
-  const handleUpdate = useCallback(() => {
-    if (currentName) {
-      updateCurrentRepo(currentName)
+    if (selectedItem?.name) {
+      setCurrentName(selectedItem?.name);
     }
-  }, [currentName])
+  }, [selectedItem?.name]);
 
-  const handleCreate = useCallback(() => {
-    if (newRepoName && newRepoName?.length > 0) {
-      createNewRepo(newRepoName)
+  useEffect(() => {
+    setNewRepoName('');
+  }, [items]);
+
+  const handleEditChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCurrentName(event.target.value);
+  };
+
+  const handleNewChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setNewRepoName(event.target.value);
+  };
+
+  const handleUpdate = () => {
+    const isValidToUpdate = currentName && currentName.length > 0 && currentName !== selectedItem?.name;
+
+    if (isValidToUpdate) {
+      updateCurrentRepo(currentName);
     }
-  }, [newRepoName])
+  };
 
-  if (reposLoading) {
-    return <div>Loading...</div>
+  const handleCreate = () => {
+    const isValidToCreate = newRepoName && newRepoName.length > 0;
+
+    if (isValidToCreate) {
+      createNewRepo(newRepoName);
+    }
+  };
+
+  const handleSelectRepoChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setCurrentRepo(event.target.value);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  if (reposError) {
-    return <div>{reposError}</div>
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
     <div className="container">
-      {repos.length > 0 && (
+      {items.length > 0 && (
         <div className="wrapper mb-1">
           <div>
-            <select
-              name="repo"
-              value={currentRepo?.id}
-              onChange={(event) => setCurrentRepo(event.target.value)}
-              className="mr-1"
-            >
-              {repos.map((repo) => (
+            <select name="repo" value={selectedItemId} onChange={handleSelectRepoChange} className="mr-1">
+              {items.map((repo) => (
                 <option key={repo.id} value={repo.id}>
                   {repo.name}
                 </option>
@@ -121,5 +124,5 @@ export function Repo() {
         }
       `}</style>
     </div>
-  )
+  );
 }

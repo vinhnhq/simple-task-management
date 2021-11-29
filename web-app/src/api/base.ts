@@ -1,26 +1,26 @@
 interface HttpResponse<T> extends Response {
-  parsedBody?: T
+  parsedBody?: T;
 }
 
 export async function fetch<T>(request: RequestInfo): Promise<HttpResponse<T>> {
   try {
-    const response: HttpResponse<T> = await window.fetch(request)
+    const response: HttpResponse<T> = await window.fetch(request);
     if (response.status === 200 || response.status === 201) {
-      response.parsedBody = await response.json()
+      response.parsedBody = await response.json();
     }
 
     if (!response.ok) {
-      throw new Error(response.statusText)
+      throw new Error(response.statusText);
     }
 
-    return response
+    return response;
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
 export async function get<T>(path: string, args: RequestInit = { method: 'get' }): Promise<HttpResponse<T>> {
-  return await fetch<T>(new Request(path, args))
+  return await fetch<T>(new Request(path, args));
 }
 
 export async function post<T>(
@@ -35,7 +35,7 @@ export async function post<T>(
     body: JSON.stringify(body),
   }
 ): Promise<HttpResponse<T>> {
-  return await fetch<T>(new Request(path, args))
+  return await fetch<T>(new Request(path, args));
 }
 
 export async function put<T>(
@@ -50,9 +50,9 @@ export async function put<T>(
     body: JSON.stringify(body),
   }
 ): Promise<HttpResponse<T>> {
-  return await fetch<T>(new Request(path, args))
+  return await fetch<T>(new Request(path, args));
 }
 
 export async function del<T>(path: string, args: RequestInit = { method: 'delete' }): Promise<HttpResponse<T>> {
-  return await fetch<T>(new Request(path, args))
+  return await fetch<T>(new Request(path, args));
 }

@@ -1,7 +1,7 @@
-import React from 'react'
+import React from 'react';
 
-import { Repo } from './components/repo'
-import { List } from './components/list'
+import { Repo } from './components/repo';
+import { List } from './components/list';
 
 export function Kanban() {
   return (
@@ -11,5 +11,5 @@ export function Kanban() {
       <Repo />
       <List />
     </div>
-  )
+  );
 }

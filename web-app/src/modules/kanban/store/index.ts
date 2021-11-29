@@ -1,115 +1,148 @@
-import { useEffect } from 'react'
-import { proxy, useSnapshot } from 'valtio'
+import { useEffect } from 'react';
+import { derive } from 'valtio/utils';
+import { proxy, useSnapshot } from 'valtio';
 
-import { kanban } from 'src/api'
-import { IRepo } from 'src/interfaces'
+import { kanban } from 'src/api';
+import { setInfo } from 'src/store';
+import { IList, IRepo } from 'src/interfaces';
 
 const store = proxy<{
-  repos: IRepo[]
-  reposLoading: boolean
-  currentRepo: IRepo | null
-  reposError: string | null
+  list: {
+    items: IList[];
+    selectedItemId?: string;
+    loading: boolean;
+    error: string | null;
+  };
+  repo: {
+    items: IRepo[];
+    selectedItemId?: string;
+    loading: boolean;
+    error: string | null;
+  };
 }>({
-  repos: [],
-  reposLoading: false,
-  reposError: null,
-  currentRepo: null,
-})
+  list: {
+    items: [],
+    selectedItemId: undefined,
+    loading: false,
+    error: null,
+  },
+  repo: {
+    items: [],
+    selectedItemId: undefined,
+    loading: false,
+    error: null,
+  },
+});
 
-export function useStore() {
-  return useSnapshot(store)
+const derivedRepo = derive(
+  {
+    selectedItem: (get) => get(store.repo).items.find((item) => item.id === get(store).list.selectedItemId),
+  },
+  {
+    proxy: store.repo,
+  }
+);
+
+export function useRepoStore() {
+  return useSnapshot(derivedRepo);
+}
+
+export function useListStore() {
+  return useSnapshot(store.list);
 }
 
 export async function fetchRepos() {
   try {
-    store.reposLoading = true
+    store.repo.loading = true;
 
-    const response = await kanban.getAllRepos()
-    store.repos = response.parsedBody?.repos || []
+    const response = await kanban.getAllRepos();
+    store.repo.items = response.parsedBody?.repos || [];
 
-    if (store.currentRepo === null) {
-      store.currentRepo = store.repos[0]
+    if (store.repo.selectedItemId === null) {
+      store.repo.selectedItemId = store.repo.items[0].id;
     }
+
+    setInfo('Repos fetched');
   } catch (error) {
     if (error instanceof Error) {
-      store.reposError = error.message
+      store.repo.error = error.message;
     }
   } finally {
-    store.reposLoading = false
+    store.repo.loading = false;
   }
 }
 
 export function setCurrentRepo(id: string) {
-  store.currentRepo = store.repos.find((repo) => repo.id === id) || null
+  store.repo.selectedItemId = store.repo.items.find((repo) => repo.id === id)?.id;
 }
 
 export function useFetchRepos() {
   useEffect(() => {
-    fetchRepos()
-  }, [])
+    fetchRepos();
+  }, []);
 }
 
 export async function updateCurrentRepo(name: string) {
-  if (store.currentRepo === null) {
-    return
+  if (!store.repo.selectedItemId) {
+    return;
   }
 
   try {
-    store.reposLoading = true
+    store.repo.loading = true;
 
-    const response = await kanban.editRepo({ id: store.currentRepo?.id, name })
+    const response = await kanban.editRepo({ id: store.repo.selectedItemId, name });
     if (response) {
-      const repo = store.repos.find((repo) => repo.id === store.currentRepo?.id)
+      const repo = store.repo.items.find((repo) => repo.id === store.repo.selectedItemId);
       if (repo) {
-        repo.name = name
-        store.currentRepo = repo
+        repo.name = name;
+        store.repo.selectedItemId = repo.id;
       }
     }
   } catch (error) {
     if (error instanceof Error) {
-      store.reposError = error.message
+      store.repo.error = error.message;
     }
   } finally {
-    store.reposLoading = false
+    store.repo.loading = false;
   }
 }
 
 export async function createNewRepo(name: string) {
   try {
-    store.reposLoading = true
+    store.repo.loading = true;
 
-    const response = await kanban.createRepo({ name })
+    const response = await kanban.createRepo({ name });
     if (response.parsedBody) {
-      store.repos.push(response.parsedBody)
+      store.repo.items.push(response.parsedBody);
     }
   } catch (error) {
     if (error instanceof Error) {
-      store.reposError = error.message
+      store.repo.error = error.message;
     }
   } finally {
-    store.reposLoading = false
+    store.repo.loading = false;
   }
 }
 
 export async function deleteCurrentRepo() {
-  if (store.currentRepo === null) {
-    return
+  if (!store.repo.selectedItemId) {
+    return;
   }
 
   try {
-    store.reposLoading = true
+    store.repo.loading = true;
 
-    const response = await kanban.deleteRepo(store.currentRepo?.id)
-    if (response) {
-      const newRepos = store.repos.filter((repo) => repo.id !== store.currentRepo?.id)
-      store.repos = newRepos
-      store.currentRepo = newRepos[0] || null
+    const response = await kanban.deleteRepo(store.repo.selectedItemId);
+    if (response.ok) {
+      const newRepos = store.repo.items.filter((repo) => repo.id !== store.repo.selectedItemId);
+      store.repo.items = newRepos;
+      store.repo.selectedItemId = newRepos[0].id;
     }
   } catch (error) {
     if (error instanceof Error) {
-      store.reposError = error.message
+      store.repo.error = error.message;
     }
   } finally {
-    store.reposLoading = false
+    store.repo.loading = false;
   }
 }

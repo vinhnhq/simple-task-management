@@ -14,7 +14,7 @@ import {
   createCard,
   editCard,
   deleteCard,
-} from './kanban'
+} from './kanban';
 
 export const kanban = {
   getAllRepos,
@@ -32,4 +32,4 @@ export const kanban = {
   createCard,
   editCard,
   deleteCard,
-}
+};
