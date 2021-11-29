@@ -251,7 +251,7 @@ app.delete('/api/card/:id', (req, res) => {
   for (let repo of REPOS) {
     for (let list of repo.lists) {
       const cardIndex = list.cards.findIndex(card => card.id === req.params.id);
-      if (cardIndex) {
+      if (cardIndex >= 0) {
         list.cards.splice(cardIndex, 1);
         break;
       }
