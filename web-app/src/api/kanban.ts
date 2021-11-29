@@ -64,9 +64,9 @@ export async function getCardById(id: string) {
   return get(path);
 }
 
-export async function createCard(payload: { text: string; listId: string }) {
+export async function createCard(payload: { text: string; listId: string; notes?: string }) {
   const path = `${API_URL}/list/${payload.listId}/card`;
-  const extendedOptions = { text: payload.text };
+  const extendedOptions = { text: payload.text, notes: payload.notes };
 
   return post<ICard>(path, extendedOptions);
 }

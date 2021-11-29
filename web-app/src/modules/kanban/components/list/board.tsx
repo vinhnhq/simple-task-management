@@ -1,6 +1,7 @@
 import React, { DragEvent, KeyboardEvent, ReactElement, useMemo, useState } from 'react';
 
 import { IStage } from 'src/interfaces';
+import { toLocaleString } from 'src/common/utils';
 
 import { useListStore } from '../../store';
 import { deleteCard, createCard, updateCard, moveCard } from '../../store/cardActions';
@@ -67,9 +68,9 @@ export function Board() {
           >
             <div>
               <h5>{card.text}</h5>
-              <p>{card.note}</p>
+              <p>{card.notes}</p>
 
-              {card.updatedAt && <p>{card.updatedAt}</p>}
+              {card.updatedAt && <p>{toLocaleString(card.updatedAt)}</p>}
             </div>
 
             <div style={{ textAlign: 'right' }}>

@@ -3,8 +3,7 @@ export type IStage = 'Open' | 'Confirmed' | 'False Positive' | 'Fixed';
 export interface ICard {
   id: string;
   text: string;
-  note?: string;
-  createdAt?: string;
+  notes?: string;
   updatedAt?: string;
 }
 

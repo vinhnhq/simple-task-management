@@ -30,8 +30,10 @@ function makeList(title, cards = []) {
   };
 }
 
-function makeCard(text) {
+function makeCard(text, notes = "") {
   return {
+    updatedAt: new Date(),
+    notes,
     text,
     id: uuid.v4()
   };
@@ -234,7 +236,8 @@ app.post('/api/list/:id/card', (req, res, next) => {
     next(err);
   }
   const cardSchema = Joi.object().keys({
-    text: Joi.string().required()
+    text: Joi.string().required(),
+    notes: Joi.string().allow('').optional(),
   });
   const { error: validationError } = Joi.validate(req.body, cardSchema);
   if (validationError) {
@@ -242,7 +245,7 @@ app.post('/api/list/:id/card', (req, res, next) => {
     err.status = 400;
     next(err);
   }
-  const card = makeCard(req.body.text);
+  const card = makeCard(req.body.text, req.body.notes);
   list.cards.push(card);
   res.status(201).json(card);
 });
@@ -287,6 +290,8 @@ app.put('/api/card/:id', (req, res, next) => {
     return next(err);
   }
   card.text = req.body.text;
+  card.notes = req.body.notes;
+  card.updatedAt = new Date();
   return res.status(204).send();
 });
 

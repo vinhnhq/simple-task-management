@@ -39,7 +39,7 @@ export async function createCard(text: string) {
   try {
     store.card.loading = true;
 
-    const response = await kanban.createCard({ listId: openListId, text });
+    const response = await kanban.createCard({ listId: openListId, text, notes: `treat text ${text} as notes` });
     if (response.parsedBody) {
       for (let list of store.list.items) {
         if (list.id === openListId) {
@@ -102,13 +102,22 @@ export async function moveCard(cardId: string, currListId: string, nextListStage
     const currListTitle = store.list.items.find((list) => list.id === currListId)?.title;
     const nextList = store.list.items.find((list) => list.title === nextListStage);
 
-    if (!currListTitle || !nextList?.title || !isValidToTransit(currListTitle, nextList.title)) {
+    const isNotValid =
+      !currListTitle ||
+      !nextList?.title ||
+      !isValidToTransit(currListTitle, nextList.title) ||
+      currListTitle === nextList.title;
+    if (isNotValid) {
       setError(`Cannot transit from ${currListTitle} to ${nextList?.title}`);
       return;
     }
 
     await kanban.deleteCard(cardId);
-    await kanban.createCard({ listId: nextList.id, text: currCard?.text || '' });
+    await kanban.createCard({
+      listId: nextList.id,
+      text: currCard?.text || '',
+      notes: currCard?.notes || '',
+    });
     await fetchLists();
   } catch (error) {
     if (error instanceof Error) {
